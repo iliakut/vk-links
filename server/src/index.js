@@ -16,14 +16,15 @@ app.listen(process.env.PORT || config.port,
 
 let test = '10';
 let db = {};
-
+/*
 app.get('/', (req, res) => {
   res.send(test);
+  console.log(req);
 });
+*/
 
 app.post('/', function(req, res) {
   let name = req.body.name;
   console.log(name);
-  db['name'] = name;
-  console.log(db);
+  res.send('123');
 });
