@@ -38,7 +38,7 @@ export default {
   }),
   methods: {
     sendName: function() {
-      axios.post('http://localhost:8081/',  {name: 'Dave'})
+      axios.post('http://localhost:8081/',  {name: 'Vasya'})
         .then((response) => {
           console.log(response);
         })
