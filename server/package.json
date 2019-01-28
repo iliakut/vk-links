@@ -1,0 +1,21 @@
+{
+  "name": "vk-links-server",
+  "version": "1.0.0",
+  "description": "server-part",
+  "main": "src/index.js",
+  "author": "Ilia Kutyrev",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "nodemon --ext js --watch src"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.9"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "morgan": "^1.9.1"
+  }
+}
