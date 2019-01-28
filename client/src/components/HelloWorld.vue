@@ -21,7 +21,7 @@
             >Discord Community</a
           >
         </p>
-        <v-text-field v-model="name"></v-text-field>
+        <v-text-field v-model="id"></v-text-field>
         <v-btn @click="sendName">send to server</v-btn>
       </v-flex>
 
@@ -34,11 +34,11 @@ import axios from 'axios'
 
 export default {
   data: () => ({
-    name: ''
+    id: ''
   }),
   methods: {
     sendName: function() {
-      axios.post('http://localhost:8081/',  {name: 'Vasya'})
+      axios.post('http://localhost:8081/',  {id: '17784637'})
         .then((response) => {
           console.log(response);
         })

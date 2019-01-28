@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const morgan = require('morgan');
 const config = require('./config/config');
+const request_promise = require('request-promise')
 
 const app = express();
 
@@ -16,15 +17,38 @@ app.listen(process.env.PORT || config.port,
 
 let test = '10';
 let db = {};
-/*
+
 app.get('/', (req, res) => {
   res.send(test);
   console.log(req);
 });
-*/
+
 
 app.post('/', function(req, res) {
-  let name = req.body.name;
-  console.log(name);
-  res.send('123');
+  // check reseived information
+  let id = req.body.id;
+  console.log(id);
+  // get API options
+  const options = {
+    method: 'GET',
+    uri: 'https://api.vk.com/method/friends.get?v=5.52&',
+    qs: {
+      access_token: 'b07354b5b07354b5b07354b5d8b01b4b52bb073b07354b5ec32f7b936771553438e7f17',
+      user_id: id,
+      order: 'hints'
+    },
+    json: true
+  };
+  // get data from vk-API
+  request_promise(options)
+    .then(function (response) {
+      let resp = response;
+      console.log(resp);
+      res.send(resp);
+    })
+    .catch(function (err) {
+      console.log(err);
+    })
+
+
 });
