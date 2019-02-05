@@ -24,8 +24,9 @@ app.post('/', function(req, res) {
   // check reseived information
   let id1 = req.body.id;
   let id_list = {
-    'arr': 0,
-    'len': 0
+    'ids_arr': 0,
+    'len': 0,
+    'fiends_obj': {}
   };
   let options = {
     method: 'GET',
@@ -37,63 +38,72 @@ app.post('/', function(req, res) {
     },
     json: true
   };
-
   console.log('getting data from VK-API');
+
   // get data from vk-API
   request_promise(options)
     .then((response) => {
-      id_list.arr = response.response.items;
+      id_list.ids_arr = response.response.items;
       id_list.len = response.response.count;
 
-      // записать в файл
-      fs.appendFileSync("data.txt", id_list.arr);
-      fs.appendFileSync("data.txt", '\n');
-      fs.appendFileSync("data.txt", id_list.len);
-      fs.appendFileSync("data.txt", '\n');
+      // пройтись по всему массиву id дла составления массива promises
+      let promises_arr = [];
+      for (let i = 0; i < id_list.ids_arr.length; i++) {
+        const temp_options = JSON.parse(JSON.stringify(options));
+        temp_options.qs.user_id = id_list.ids_arr[i];
+        promises_arr.push(request_promise(temp_options));
+      }
+      return promises_arr
+    })
+    .then((promises_arr) => {
+      Promise.all(promises_arr)
+        .then(values => {
+          console.log('getting deeper');
 
-      // пройтись по всему массиву id
-      for (let i = 0; i < id_list.arr.length; i++) {
-        let current_id = id_list.arr[i];
-        // создадим для  каждого id свой обюъект
-        id_list[current_id] = {};
-        id_list[current_id]['arr'] = [];
-        id_list[current_id]['len'] = 0;
-        options.qs.user_id = current_id;
-        // запрос для каждого id
-        request_promise(options)
-          .then((res) => {
-            console.log('getting deep' + current_id);
-            id_list[current_id].set = new Set(res.response.items);
-            id_list[current_id].len = res.response.count;
+          for (let i = 0; i < values.length; i++) {
+            // проверка на ошибку ответа
+            if (values[i].response !== undefined) {
+              let current_id = id_list.ids_arr[i];
+              id_list.fiends_obj[current_id] = {
+                'ids_arr': values[i].response.items,
+                'len': values[i].response.count,
+                'fiends_obj': {}
+              }
+            } else {
+              let current_id = id_list.ids_arr[i];
+              id_list.fiends_obj[current_id] = 'error'
+            }
+          }
+          fs.appendFileSync("data.json", JSON.stringify(id_list));
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 
-            // записать в файл
-            fs.appendFile("data.txt", current_id, function(error) {
-              if(error) throw error;
-              fs.appendFile("data.txt", '\n', function(error){
+
+  /*            fs.appendFile("data.txt", current_id, function(error) {
                 if(error) throw error;
-                fs.appendFile("data.txt", id_list[current_id].arr, function(error){
+                fs.appendFile("data.txt", '\n', function(error){
                   if(error) throw error;
-                  fs.appendFile("data.txt", '\n', function(error){
+                  fs.appendFile("data.txt", id_list[current_id].ids_arr, function(error){
                     if(error) throw error;
-                    fs.appendFile("data.txt", id_list[current_id].len, function(error){
+                    fs.appendFile("data.txt", '\n', function(error){
                       if(error) throw error;
-                      fs.appendFile("data.txt", '\n', function(error){
-                        if(error) throw error
+                      fs.appendFile("data.txt", id_list[current_id].len, function(error){
+                        if(error) throw error;
+                        fs.appendFile("data.txt", '\n', function(error){
+                          if(error) throw error
+                        });
                       });
                     });
                   });
                 });
-              });
-            });
-          })
-          .catch((err) => {
-            console.log(err);
-          })
-      }
-      //res.send(resp); отправить на клиента
-    })
-    .catch((error) => {
-      console.log(error);
-    })
+              });*/
 
+
+  //res.send(resp); отправить на клиента
 });
