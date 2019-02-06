@@ -84,26 +84,5 @@ app.post('/', function(req, res) {
       console.log(error);
     });
 
-
-  /*            fs.appendFile("data.txt", current_id, function(error) {
-                if(error) throw error;
-                fs.appendFile("data.txt", '\n', function(error){
-                  if(error) throw error;
-                  fs.appendFile("data.txt", id_list[current_id].ids_arr, function(error){
-                    if(error) throw error;
-                    fs.appendFile("data.txt", '\n', function(error){
-                      if(error) throw error;
-                      fs.appendFile("data.txt", id_list[current_id].len, function(error){
-                        if(error) throw error;
-                        fs.appendFile("data.txt", '\n', function(error){
-                          if(error) throw error
-                        });
-                      });
-                    });
-                  });
-                });
-              });*/
-
-
   //res.send(resp); отправить на клиента
 });
