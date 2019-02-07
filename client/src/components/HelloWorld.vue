@@ -1,8 +1,8 @@
 <template>
   <v-form>
-    <v-container align-end>
-     <v-layout text-xs-center>
-      <v-flex md-4>
+    <v-container>
+     <v-layout text-xs-center column>
+       <v-flex xs12  offset-(xs4)>
           <v-text-field
               v-model="first_id"
               :counter="100"
@@ -14,7 +14,10 @@
               hint="id или link или screen_name"
           ></v-text-field>
       </v-flex>
-      <v-flex md-4>
+       <v-flex xs12>
+         <v-btn @click="sendName">send to server</v-btn>
+       </v-flex>
+       <v-flex xs12>
         <v-form>
           <v-text-field
               v-model="second_id"
@@ -27,9 +30,6 @@
               hint="id или link или screen_name"
           ></v-text-field>
         </v-form>
-      </v-flex>
-      <v-flex mb-4>
-        <v-btn @click="sendName">send to server</v-btn>
       </v-flex>
     </v-layout>
     </v-container>
