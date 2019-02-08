@@ -1,11 +1,10 @@
 <template>
-  <v-form>
+  <v-form ref="form" v-model="valid">
     <v-container>
      <v-layout text-xs-center column>
        <v-flex xs12  offset-(xs4)>
           <v-text-field
               v-model="first_id"
-              :counter="100"
               label="первый пользователь"
               placeholder="id1"
               :rules="[() => !!first_id || 'Это обязательное поле']"
@@ -15,13 +14,11 @@
           ></v-text-field>
       </v-flex>
        <v-flex xs12>
-         <v-btn @click="sendName">send to server</v-btn>
+         <v-btn round @click="findLinks">Найти связи</v-btn>
        </v-flex>
        <v-flex xs12>
-        <v-form>
           <v-text-field
               v-model="second_id"
-              :counter="100"
               label="второй пользователь"
               placeholder="id2"
               :rules="[() => !!first_id || 'Это обязательное поле']"
@@ -29,8 +26,8 @@
               color="#4c75a3"
               hint="id или link или screen_name"
           ></v-text-field>
-        </v-form>
       </v-flex>
+
     </v-layout>
     </v-container>
   </v-form>
@@ -43,17 +40,26 @@ export default {
   data: () => ({
     id: '',
     first_id: '',
-    second_id: ''
+    second_id: '',
+    valid: false
   }),
   methods: {
-    sendName: function() {
-      axios.post('http://localhost:8081/',  {id: '17784637'})
+    sendName: function () {
+      axios.post('http://localhost:8081/', {id: '17784637'})
         .then((response) => {
           console.log(response);
         })
         .catch((error) => {
           console.log(error);
         });
+    },
+    validate() {
+      if (this.$refs.form.validate()) {
+        console.log('validated')
+      }
+    },
+    findLinks: function() {
+      this.validate();
     }
   }
 };
