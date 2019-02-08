@@ -7,10 +7,10 @@
               v-model="first_id"
               label="первый пользователь"
               placeholder="id1"
-              :rules="[() => !!first_id || 'Это обязательное поле']"
+              :rules="rules"
               required
               color="#4c75a3"
-              hint="id или link или screen_name"
+              hint="link"
           ></v-text-field>
       </v-flex>
        <v-flex xs12>
@@ -21,10 +21,10 @@
               v-model="second_id"
               label="второй пользователь"
               placeholder="id2"
-              :rules="[() => !!first_id || 'Это обязательное поле']"
+              :rules="rules"
               required
               color="#4c75a3"
-              hint="id или link или screen_name"
+              hint="link"
           ></v-text-field>
       </v-flex>
 
@@ -41,7 +41,11 @@ export default {
     id: '',
     first_id: '',
     second_id: '',
-    valid: false
+    valid: false,
+    rules: [
+      v => (v || '').indexOf(' ') < 0 || 'Пробелы недопустимы',
+      v => !!v || 'Обязательное поле'
+    ]
   }),
   methods: {
     sendName: function () {
@@ -61,7 +65,20 @@ export default {
     findLinks: function() {
       this.validate();
     }
-  }
+  },
+  computed: {
+    rules123 () {
+      const rules = [];
+
+      const rule1 = v => (v || '').indexOf(' ') < 0 || 'Пробелы недопустимы';
+      rules.push(rule1);
+      const rule2 = v => !!v || 'Обязательное поле';
+      rules.push(rule2);
+
+      //      v => /.+@.+/.test(v) || 'E-mail must be valid'
+      return rules
+    }
+}
 };
 </script>
 
