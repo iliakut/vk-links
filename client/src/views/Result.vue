@@ -1,16 +1,12 @@
 <template>
-  <v-container>
-    <v-layout text-xs-center wrap>
-      <v-flex mb-4>
-        <v-btn>test</v-btn>
-      </v-flex>
-    </v-layout>
-  </v-container>
+  <SearchResult></SearchResult>
 </template>
 
 <script>
+  import SearchResult from "../components/SearchResult";
 export default {
   components: {
+    SearchResult
   }
 };
 </script>

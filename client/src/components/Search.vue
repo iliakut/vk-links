@@ -15,7 +15,7 @@
           ></v-text-field>
       </v-flex>
        <v-flex xs12>
-         <v-btn round @click="findLinks" color="#4c75a3">Найти связи</v-btn>
+         <v-btn round @click="activateSearch" color="#4c75a3">Найти связи</v-btn>
        </v-flex>
        <v-flex xs12>
           <v-text-field
@@ -37,8 +37,10 @@
 
 <script>
 import axios from 'axios'
+import { mapState, mapMutations } from 'vuex'
 
 export default {
+  name: "Search",
   data: () => ({
     first_id: '',
     second_id: '',
@@ -51,24 +53,31 @@ export default {
   }),
   methods: {
     sendName: function () {
-      axios.post('http://localhost:8081/', {id: '17784637'})
+      this.changeStatus(1);
+      axios.post('http://localhost:8081/', {id1: this.id1, id2: this.id2})
         .then((response) => {
           console.log(response);
+          this.changeStatus(3);
         })
         .catch((error) => {
           console.log(error);
+          this.changeStatus(2);
         });
     },
     validate() {
-      if (this.$refs.form.validate()) {
-        console.log('validated')
+      return !!this.$refs.form.validate();
+    },
+    activateSearch: function() {
+      if(this.validate()) { // if valid
+        //this.sendName(); // send data to server - закомментировал на время разработки
+        this.receivingFromServer
+        this.$router.push("/result");
       }
     },
-    findLinks: function() {
-      this.validate();
-    }
+    ...mapMutations(["changeStatus"])
+  },
+  computed: {
+    ...mapState(["searchStatus"])
   }
 };
 </script>
-
-<style></style>
