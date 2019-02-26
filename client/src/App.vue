@@ -26,7 +26,7 @@
           <v-flex xs12>
             <v-avatar tile>
               <v-img src="./img/icons/VK.com-logo.svg"></v-img>
-              <strong style="color: #4c75a3" class="title">links</strong>
+              <strong style="color: #4c75a3" class="title unselectable">links</strong>
             </v-avatar>
           </v-flex>
         </v-layout>
@@ -59,3 +59,11 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+  .unselectable {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
+</style>

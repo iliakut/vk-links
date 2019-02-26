@@ -9,12 +9,13 @@
               placeholder="id1"
               :rules="rules"
               required
+              outline
               color="#4c75a3"
               hint="link"
           ></v-text-field>
       </v-flex>
        <v-flex xs12>
-         <v-btn round @click="findLinks">Найти связи</v-btn>
+         <v-btn round @click="findLinks" color="#4c75a3">Найти связи</v-btn>
        </v-flex>
        <v-flex xs12>
           <v-text-field
@@ -23,6 +24,7 @@
               placeholder="id2"
               :rules="rules"
               required
+              outline
               color="#4c75a3"
               hint="link"
           ></v-text-field>
@@ -38,13 +40,13 @@ import axios from 'axios'
 
 export default {
   data: () => ({
-    id: '',
     first_id: '',
     second_id: '',
     valid: false,
     rules: [
       v => (v || '').indexOf(' ') < 0 || 'Пробелы недопустимы',
-      v => !!v || 'Обязательное поле'
+      v => !!v || 'Обязательное поле',
+      //v => /https:\/\/vk.com\//.test(v) || 'Не похоже на ссылку' // - закомментировал на время разработки
     ]
   }),
   methods: {
@@ -65,20 +67,7 @@ export default {
     findLinks: function() {
       this.validate();
     }
-  },
-  computed: {
-    rules123 () {
-      const rules = [];
-
-      const rule1 = v => (v || '').indexOf(' ') < 0 || 'Пробелы недопустимы';
-      rules.push(rule1);
-      const rule2 = v => !!v || 'Обязательное поле';
-      rules.push(rule2);
-
-      //      v => /.+@.+/.test(v) || 'E-mail must be valid'
-      return rules
-    }
-}
+  }
 };
 </script>
 
