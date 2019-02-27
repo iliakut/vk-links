@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-layout align-center justify-center column fill-height>
+    <v-layout align-center justify-center column>
       <v-flex xs12>
         <v-progress-circular
             :size="100"
