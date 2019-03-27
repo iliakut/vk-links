@@ -1,13 +1,13 @@
 <template>
-  <HelloWorld />
+  <Search />
 </template>
 
 <script>
-import HelloWorld from "../components/HelloWorld";
+import Search from "../components/Search";
 
 export default {
   components: {
-    HelloWorld
+    Search
   }
 };
 </script>
