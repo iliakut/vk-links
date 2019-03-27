@@ -13,7 +13,7 @@ export default new Vuex.Store({
   },
   mutations: {
     changeStatus(state, payload) {
-      state.searchStatus = payload
+      state.searchStatus = payload;
     }
   },
   actions: {}

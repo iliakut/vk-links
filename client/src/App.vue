@@ -2,21 +2,23 @@
   <v-app dark>
     <v-content>
       <v-btn icon large dark to="/" @click="transitionReverse = false">
-        <v-icon >search</v-icon>
+        <v-icon>search</v-icon>
       </v-btn>
       <v-btn icon large dark to="/result" @click="transitionReverse = true">
-        <v-icon >timeline</v-icon>
+        <v-icon>timeline</v-icon>
       </v-btn>
       <v-dialog width="500" v-model="dialog">
         <v-btn slot="activator" icon large dark>
-          <v-icon >help</v-icon>
+          <v-icon>help</v-icon>
         </v-btn>
         <v-card color="#4c75a3" @click="dialog = false">
           <v-card-text>
-            Приложение позволяет найти связи между двумя пользователями вконтакте. Для поиска связей
-            требуется ввести ссылку на страницу пользователя. Поиск связий происходит по трем "рукопожатиям",
-            то есть: пользователь 1 - друзья пользователя 1 - друзья друзей пользователя 1 - пользователь 2.
-            В результаты попадают и связи короче, чем три "рукопожатия". В результатах отображаются все
+            Приложение позволяет найти связи между двумя пользователями
+            "Вконтакте". Для поиска связей требуется ввести ссылку на страницу
+            пользователя. Поиск связий происходит по трем "рукопожатиям", то
+            есть: пользователь 1 - друзья пользователя 1 - друзья друзей
+            пользователя 1 - пользователь 2. В результаты попадают и связи
+            короче, чем три "рукопожатия". В результатах отображаются все
             найденные связи между двумя пользователями.
           </v-card-text>
         </v-card>
@@ -26,7 +28,9 @@
           <v-flex xs12>
             <v-avatar tile>
               <v-img src="./img/icons/VK.com-logo.svg"></v-img>
-              <strong style="color: #4c75a3" class="title unselectable">links</strong>
+              <strong style="color: #4c75a3" class="title unselectable">
+                links
+              </strong>
             </v-avatar>
           </v-flex>
         </v-layout>
@@ -53,17 +57,14 @@ export default {
       transitionReverse: true,
       dialog: false
     };
-  },
-  methods: {
-
   }
 };
 </script>
 
 <style scoped>
-  .unselectable {
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-  }
+.unselectable {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
 </style>

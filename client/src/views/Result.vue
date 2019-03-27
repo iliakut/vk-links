@@ -1,9 +1,9 @@
 <template>
-  <SearchResult></SearchResult>
+  <SearchResult />
 </template>
 
 <script>
-  import SearchResult from "../components/SearchResult";
+import SearchResult from "../components/SearchResult";
 export default {
   components: {
     SearchResult

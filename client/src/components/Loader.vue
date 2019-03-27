@@ -3,10 +3,10 @@
     <v-layout align-center justify-center column>
       <v-flex xs12>
         <v-progress-circular
-            :size="100"
-            :width="7"
-            color="#4c75a3"
-            indeterminate
+          :size="100"
+          :width="7"
+          color="#4c75a3"
+          indeterminate
         ></v-progress-circular>
       </v-flex>
       <v-flex xs12>
@@ -17,8 +17,7 @@
 </template>
 
 <script>
-  export default {
-    name: "Loader"
-  }
+export default {
+  name: "Loader"
+};
 </script>
-
