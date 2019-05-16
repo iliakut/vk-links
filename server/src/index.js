@@ -1,3 +1,4 @@
+const access_token = require('./access_token');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -32,7 +33,7 @@ app.post('/', function(req, res) {
     method: 'GET',
     uri: 'https://api.vk.com/method/friends.get?v=5.52&',
     qs: {
-      access_token: 'b07354b5b07354b5b07354b5d8b01b4b52bb073b07354b5ec32f7b936771553438e7f17',
+      access_token: access_token.my_token,
       user_id: id1,
       order: 'hints'
     },
