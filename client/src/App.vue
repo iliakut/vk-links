@@ -44,7 +44,7 @@
     </v-content>
     <v-footer>
       <v-spacer></v-spacer>
-      <pre>github.com/iliakut </pre>
+      <pre><a href="https://github.com/iliakut">github.com/iliakut</a></pre>
     </v-footer>
   </v-app>
 </template>
