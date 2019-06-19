@@ -16,6 +16,10 @@ app.use(cors());
 app.listen(process.env.PORT || config.port,
   () => console.log(`Server start on port ${config.port} ...`));
 
+function promiseFactory(one_of_promise_all) {
+  return request_promise(one_of_promise_all);
+}
+
 /*app.get('/', (req, res) => {
   res.send('server ok');
   console.log(req);
@@ -77,39 +81,61 @@ app.post('/', function(req, res) {
       return Promise.all(promises_arr);
     })
     .then(promise_all_result => {
-          console.log('getting deeper');
-          let promises_arr_deeper = [];
-          // составим результируюзий объект и заполним новый promise_all
-          for (let i = 0; i < promise_all_result.length; i++) {
-            // проверка на ошибку ответа
-            if (promise_all_result[i].response !== undefined) {
-              // добавим объект этого друга с его списком в массив
-              let current_id = id_list.ids_arr[i];
-              id_list.fiends_obj[current_id] = {
-                'ids_arr': promise_all_result[i].response.items,
-                'len': promise_all_result[i].response.count,
-                'fiends_obj': {}
-              };
-              // составим promise_all
-              //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-              for (let j = 0; j < id_list.ids_arr.length; j++) {
-                // склонировать исходник опция для запроса
-                const temp_options = JSON.parse(JSON.stringify(options));
-                // подменить id для запроса
-                temp_options.qs.user_id = id_list.ids_arr[j];
-                // добавить объект запроса в массив прописов
-                promises_arr_deeper.push(request_promise(temp_options));
-              }
-            } else {
-              // если ошибка ответа (скрыт список друзей)
-              let current_id = id_list.ids_arr[i];
-              id_list.fiends_obj[current_id] = 'error'
-            }
+      console.log('getting deeper');
+      let promises_all_arr_deeper = [];
+      // составим результируюзий объект и заполним новый promise_all
+      for (let i = 0; i < promise_all_result.length; i++) {
+        // проверка на ошибку ответа
+        if (promise_all_result[i].response !== undefined) {
+          // добавим объект этого друга с его списком в массив
+          let current_id = id_list.ids_arr[i];
+          // arr для создания нескольких promise all
+          let promises_all_temp_arr = [];
+          id_list.fiends_obj[current_id] = {
+            'ids_arr': promise_all_result[i].response.items,
+            'len': promise_all_result[i].response.count,
+            'fiends_obj': {}
+          };
+          // составим promise_all_deeper
+          // так как делать 100 * 100 (в среднем) запросов на сервер выдает ошибку ENOBUFS
+          for (let j = 0; j < 1; j++) {
+            // склонировать исходник опция для запроса
+            const temp_options = JSON.parse(JSON.stringify(options));
+            // подменить id для запроса
+            temp_options.qs.user_id = promise_all_result[i].response.items[j];
+            // добавить объект запроса в массив промисов
+            promises_all_temp_arr.push(request_promise(temp_options));
           }
-          // запишем в файл (для теста)
-          fs.appendFileSync("data.json", JSON.stringify(id_list));
-
-        })
+          // вернем все promise all в список из promise all (массив массивов)
+          promises_all_arr_deeper.push(promises_all_temp_arr);
+        } else {
+          // если ошибка ответа (скрыт список друзей)
+          let current_id = id_list.ids_arr[i];
+          id_list.fiends_obj[current_id] = 'error'
+        }
+      }
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!try async await
+      async function get_all_promises_all() {
+            let promise_all_result = [];
+            for (const promise_arr of promises_all_arr_deeper) {
+              const result = await Promise.all(promise_arr);
+              promise_all_result.push(result);
+            }
+            return promise_all_result;
+      }
+      (async () => {
+        let data = await get_all_promises_all();
+        fs.appendFileSync("data.json", JSON.stringify(data))
+      })();
+    })
+/*    .then((promise_arr_deeper) => {
+      return Promise.all(promise_arr_deeper);
+    })*/
+/*    .then(promise_arr_deeper_result => {
+      console.log('getting more deeper');
+      // запишем в файл (для теста)
+      fs.appendFileSync("data.json", JSON.stringify(promise_arr_deeper_result));
+    })*/
     .catch((error) => {
       console.log(error);
     });
