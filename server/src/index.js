@@ -98,7 +98,7 @@ app.post('/', function(req, res) {
           };
           // составим promise_all_deeper
           // так как делать 100 * 100 (в среднем) запросов на сервер выдает ошибку ENOBUFS
-          for (let j = 0; j < 1; j++) {
+          for (let j = 0; j < 3; j++) {
             // склонировать исходник опция для запроса
             const temp_options = JSON.parse(JSON.stringify(options));
             // подменить id для запроса
@@ -117,15 +117,22 @@ app.post('/', function(req, res) {
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!try async await
       async function get_all_promises_all() {
             let promise_all_result = [];
+            let counter = 0;
             for (const promise_arr of promises_all_arr_deeper) {
               const result = await Promise.all(promise_arr);
               promise_all_result.push(result);
+              counter++;
+              console.log(counter);
             }
             return promise_all_result;
       }
       (async () => {
         let data = await get_all_promises_all();
-        fs.appendFileSync("data.json", JSON.stringify(data))
+        fs.appendFile("data.json", JSON.stringify(data), (err) => {
+          if (err) throw err;
+          console.log('The "data to append" was appended to file!');
+        });
+        fs.appendFileSync("id_list.json", JSON.stringify(id_list));
       })();
     })
 /*    .then((promise_arr_deeper) => {
