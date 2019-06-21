@@ -55,6 +55,7 @@ app.post('/', function(req, res) {
 
   // get data from vk-API
   request_promise(options)
+    // первое рукопожатие
     .then((response) => {
       // сложим ответ в объект
       // список друзей
@@ -76,10 +77,12 @@ app.post('/', function(req, res) {
       // вернуть список промисов для последующей обработки
       return promises_arr
     })
+    // второе рукопожатие
     .then((promises_arr) => {
       // запустить все запросы (получить списки друзей людей из массива)
       return Promise.all(promises_arr);
     })
+    // обработка второго рукопожатия и запрос третьего
     .then(promise_all_result => {
       console.log('getting deeper');
       let promises_all_arr_deeper = [];
@@ -96,10 +99,11 @@ app.post('/', function(req, res) {
             'len': promise_all_result[i].response.count,
             'fiends_obj': {}
           };
-          // составим promise_all_deeper
+          // составим promise_all_deeper для третьего рукопожатия
           // так как делать 100 * 100 (в среднем) запросов на сервер выдает ошибку ENOBUFS
           for (let j = 0; j < 3; j++) {
-            // склонировать исходник опция для запроса
+            console.log( promise_all_result[i].response.items.length);
+            // склонировать исходник опции для запроса
             const temp_options = JSON.parse(JSON.stringify(options));
             // подменить id для запроса
             temp_options.qs.user_id = promise_all_result[i].response.items[j];
@@ -114,17 +118,18 @@ app.post('/', function(req, res) {
           id_list.fiends_obj[current_id] = 'error'
         }
       }
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!try async await
-      async function get_all_promises_all() {
-            let promise_all_result = [];
-            let counter = 0;
-            for (const promise_arr of promises_all_arr_deeper) {
-              const result = await Promise.all(promise_arr);
-              promise_all_result.push(result);
-              counter++;
-              console.log(counter);
-            }
-            return promise_all_result;
+
+      // запрос третьего рукопожатия
+      /*async function get_all_promises_all() {
+        let promise_all_result = [];
+        let counter = 0;
+        for (const promise_arr of promises_all_arr_deeper) {
+          const result = await Promise.all(promise_arr);
+          promise_all_result.push(result);
+          counter++;
+          //console.log(counter);
+        }
+        return promise_all_result;
       }
       (async () => {
         let data = await get_all_promises_all();
@@ -133,30 +138,14 @@ app.post('/', function(req, res) {
           console.log('The "data to append" was appended to file!');
         });
         fs.appendFileSync("id_list.json", JSON.stringify(id_list));
-      })();
+      })();*/
+
+
     })
-/*    .then((promise_arr_deeper) => {
-      return Promise.all(promise_arr_deeper);
-    })*/
-/*    .then(promise_arr_deeper_result => {
-      console.log('getting more deeper');
-      // запишем в файл (для теста)
-      fs.appendFileSync("data.json", JSON.stringify(promise_arr_deeper_result));
-    })*/
+
     .catch((error) => {
       console.log(error);
     });
 
   //res.send(resp); отправить на клиента
 });
-/*
-         // обработаем полученный итоговый список (id_list) на совпадения с id2
-          // если id2 и так есть в списке друзей пользователя id1
-          for (let i = 0; i <= id_list.ids_arr.length; i++) {
-            if (id_list.ids_arr[i] === id2) {
-              result.push([id_list.ids_arr[i]]);
-            }
-          }
-          // если второе рукопожатие
-          for (let i = 0; i <= Object.keys(id_list.fiends_obj).length; i++) {}
-*/
