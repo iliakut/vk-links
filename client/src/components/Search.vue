@@ -43,8 +43,8 @@ import { mapState, mapMutations } from "vuex";
 export default {
   name: "Search",
   data: () => ({
-    first_id: "",
-    second_id: "",
+    first_id: "17784637",
+    second_id: "15278385",
     valid: false,
     rules: [
       v => (v || "").indexOf(" ") < 0 || "Пробелы недопустимы",
@@ -60,6 +60,7 @@ export default {
         .post("http://localhost:8081/", { id1: this.first_id, id2: this.second_id })
         .then(response => {
           console.log(response);
+          this.writeMutualData(response.data);
           this.changeStatus(3);
         })
         .catch(error => {
@@ -78,7 +79,7 @@ export default {
         this.$router.push("/result");
       }
     },
-    ...mapMutations(["changeStatus"])
+    ...mapMutations(["changeStatus", "writeMutualData"])
   },
   computed: {
     ...mapState(["searchStatus"])

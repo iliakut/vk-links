@@ -54,11 +54,17 @@
         </v-avatar>
       </v-flex>
     </v-layout>
+    <v-text>{{ mutualData }}</v-text>
   </v-container>
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 export default {
-  name: "Results"
+  name: "Results",
+  computed: {
+    ...mapState(["mutualData"])
+  }
 };
 </script>
