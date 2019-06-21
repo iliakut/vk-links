@@ -57,7 +57,7 @@ export default {
     sendName: function() {
       this.changeStatus(1);
       axios
-        .post("http://localhost:8081/", { id1: this.id1, id2: this.id2 })
+        .post("http://localhost:8081/", { id1: this.first_id, id2: this.second_id })
         .then(response => {
           console.log(response);
           this.changeStatus(3);
@@ -73,7 +73,7 @@ export default {
     activateSearch: function() {
       if (this.validate()) {
         // if valid
-        //this.sendName(); // send data to server - закомментировал на время разработки
+        this.sendName(); // send data to server - закомментировал на время разработки
         this.receivingFromServer;
         this.$router.push("/result");
       }
