@@ -19,7 +19,21 @@ app.listen(process.env.PORT || config.port,
 function promiseFactory(one_of_promise_all) {
   return request_promise(one_of_promise_all);
 }
+function isMutual(mutualArr, id) {
+  return mutualArr.includes(id);
+}
+function findMutualFriends(friendsArrOfObj, id) {
+  let mutualArr = [];
+  for (let friendId in friendsArrOfObj) {
+    if (friendsArrOfObj[friendId] !== "error") {
+      if (friendsArrOfObj[friendId].ids_arr.includes(id)) {
+        mutualArr.push(friendId);
+      }
+    }
 
+  }
+  return mutualArr;
+}
 /*app.get('/', (req, res) => {
   res.send('server ok');
   console.log(req);
@@ -27,12 +41,10 @@ function promiseFactory(one_of_promise_all) {
 
 app.post('/', function(req, res) {
   // check reseived information
-  //let id1 = req.body.id;
-  res.send('server ok');
-  // для теста зададим статичный id
-  let id1 = 17784637;
-  let id2 = 226349;
-  let result = [];
+  let id1 = req.body.id1 - 0;
+  let id2 = req.body.id2 - 0;
+  //let id1 = 17784637;
+  //let id2 = 15278385;
   console.log(req.body);
   // создадим объект с результатом
   let id_list = {
@@ -102,7 +114,6 @@ app.post('/', function(req, res) {
           // составим promise_all_deeper для третьего рукопожатия
           // так как делать 100 * 100 (в среднем) запросов на сервер выдает ошибку ENOBUFS
           for (let j = 0; j < 3; j++) {
-            console.log( promise_all_result[i].response.items.length);
             // склонировать исходник опции для запроса
             const temp_options = JSON.parse(JSON.stringify(options));
             // подменить id для запроса
@@ -118,7 +129,6 @@ app.post('/', function(req, res) {
           id_list.fiends_obj[current_id] = 'error'
         }
       }
-
       // запрос третьего рукопожатия
       /*async function get_all_promises_all() {
         let promise_all_result = [];
@@ -139,13 +149,24 @@ app.post('/', function(req, res) {
         });
         fs.appendFileSync("id_list.json", JSON.stringify(id_list));
       })();*/
-
-
+      // обработка результатов
+      let result = {
+        areMutual: false,
+        mutualArr: []
+      };
+      fs.appendFileSync("id_list.json", JSON.stringify(id_list));
+      // проверить если пользователи и так друзья
+      result.areMutual = isMutual(id_list.ids_arr, id2);
+      // проверить если пользователи имеют общих друзей
+      result.mutualArr = findMutualFriends(id_list.fiends_obj, id2);
+      // запишеп результат в файл
+      fs.appendFileSync("result.json", JSON.stringify(result));
+      return result;
     })
-
+    .then(result => {
+      res.send(result); // отправить клиенту
+    })
     .catch((error) => {
       console.log(error);
     });
-
-  //res.send(resp); отправить на клиента
 });
