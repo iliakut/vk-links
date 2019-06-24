@@ -53,7 +53,7 @@ app.post('/', function(req, res) {
     'fiends_obj': {}
   };
   // настройка запроса к VK-API
-  let options = {
+  let optionsGetFriends = {
     method: 'GET',
     uri: 'https://api.vk.com/method/friends.get?v=5.52&',
     qs: {
@@ -63,10 +63,25 @@ app.post('/', function(req, res) {
     },
     json: true
   };
+  let optionsGetUserInfo = {
+    method: 'GET',
+    uri: 'https://api.vk.com/method/users.get?v=5.89',
+    qs: {
+      access_token: access_token.my_token,
+      user_ids: "",
+      fields: "photo_200"
+    },
+    json: true
+  };
+  let result = {
+    areMutual: false,
+    mutualArr: [],
+    avatars: {}
+  };
   console.log('getting data from VK-API');
 
   // get data from vk-API
-  request_promise(options)
+  request_promise(optionsGetFriends)
     // первое рукопожатие
     .then((response) => {
       // сложим ответ в объект
@@ -80,7 +95,7 @@ app.post('/', function(req, res) {
 
       for (let i = 0; i < id_list.ids_arr.length; i++) {
         // склонировать исходник опция для запроса
-        const temp_options = JSON.parse(JSON.stringify(options));
+        const temp_options = JSON.parse(JSON.stringify(optionsGetFriends));
         // подменить id для запроса
         temp_options.qs.user_id = id_list.ids_arr[i];
         // добавить объект запроса в массив прописов
@@ -94,7 +109,7 @@ app.post('/', function(req, res) {
       // запустить все запросы (получить списки друзей людей из массива)
       return Promise.all(promises_arr);
     })
-    // обработка второго рукопожатия и запрос третьего
+    // обработка второго рукопожатия и запрос третьего (пока не реализован запрос третьего)
     .then(promise_all_result => {
       console.log('getting deeper');
       let promises_all_arr_deeper = [];
@@ -115,7 +130,7 @@ app.post('/', function(req, res) {
           // так как делать 100 * 100 (в среднем) запросов на сервер выдает ошибку ENOBUFS
           for (let j = 0; j < 3; j++) {
             // склонировать исходник опции для запроса
-            const temp_options = JSON.parse(JSON.stringify(options));
+            const temp_options = JSON.parse(JSON.stringify(optionsGetFriends));
             // подменить id для запроса
             temp_options.qs.user_id = promise_all_result[i].response.items[j];
             // добавить объект запроса в массив промисов
@@ -150,10 +165,6 @@ app.post('/', function(req, res) {
         fs.appendFileSync("id_list.json", JSON.stringify(id_list));
       })();*/
       // обработка результатов
-      let result = {
-        areMutual: false,
-        mutualArr: []
-      };
       fs.appendFileSync("id_list.json", JSON.stringify(id_list));
       // проверить если пользователи и так друзья
       result.areMutual = isMutual(id_list.ids_arr, id2);
@@ -161,9 +172,19 @@ app.post('/', function(req, res) {
       result.mutualArr = findMutualFriends(id_list.fiends_obj, id2);
       // запишеп результат в файл
       fs.appendFileSync("result.json", JSON.stringify(result));
-      return result;
+
+      // получим аватарки пользователей
+      // заполним id для запроса
+      optionsGetUserInfo.qs.user_ids = result.mutualArr;
+      return request_promise(optionsGetUserInfo);
     })
-    .then(result => {
+    .then((getUserInfo_result) => {
+      // обработка ответа с аватарками
+      for (let user of getUserInfo_result.response) {
+        result.avatars[user.id] = user.photo_200;
+      }
+    })
+    .then(() => {
       res.send(result); // отправить клиенту
     })
     .catch((error) => {
