@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-layout align-center column>
-      <v-flex xs12 ma-2>
+      <v-flex xs12 ma-2 v-if="mutualData.areMutual">
         <v-avatar color="grey lighten-4" size="60">
           <img
               :src="mutualData.avatars[id1]"
