@@ -74,12 +74,13 @@ export default {
     activateSearch: function() {
       if (this.validate()) {
         // if valid
-        this.sendName(); // send data to server - закомментировал на время разработки
-        this.receivingFromServer;
+        this.sendName(); // send data to server
         this.$router.push("/result");
+        this.setFirstId(this.first_id);
+        this.setSecondId(this.second_id);
       }
     },
-    ...mapMutations(["changeStatus", "writeMutualData"])
+    ...mapMutations(["changeStatus", "writeMutualData", "setFirstId", "setSecondId"])
   },
   computed: {
     ...mapState(["searchStatus"])

@@ -10,6 +10,8 @@ export default new Vuex.Store({
     // 1 - in progress
     // 2 - error
     // 3 - received
+    id1: "",
+    id2: "",
     mutualData: {}
   },
   mutations: {
@@ -18,6 +20,12 @@ export default new Vuex.Store({
     },
     writeMutualData(state, payload) {
       state.mutualData = payload;
+    },
+    setFirstId(state, payload) {
+      state.id1 = payload;
+    },
+    setSecondId(state, payload) {
+      state.id2 = payload;
     }
   },
   actions: {}

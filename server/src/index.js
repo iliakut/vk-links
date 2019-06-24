@@ -68,7 +68,7 @@ app.post('/', function(req, res) {
     uri: 'https://api.vk.com/method/users.get?v=5.89',
     qs: {
       access_token: access_token.my_token,
-      user_ids: "",
+      user_ids: `${req.body.id1}, ${req.body.id2}`,
       fields: "photo_200"
     },
     json: true
@@ -175,7 +175,8 @@ app.post('/', function(req, res) {
 
       // получим аватарки пользователей
       // заполним id для запроса
-      optionsGetUserInfo.qs.user_ids = result.mutualArr;
+      optionsGetUserInfo.qs.user_ids += ',' + result.mutualArr;
+      console.log(optionsGetUserInfo.qs.user_ids );
       return request_promise(optionsGetUserInfo);
     })
     .then((getUserInfo_result) => {
