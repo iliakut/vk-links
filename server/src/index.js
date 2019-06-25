@@ -41,8 +41,8 @@ function findMutualFriends(friendsArrOfObj, id) {
 
 app.post('/', function(req, res) {
   // check reseived information
-  let id1 = req.body.id1 - 0;
-  let id2 = req.body.id2 - 0;
+  let id1 = req.body.id1;
+  let id2 = req.body.id2;
   //let id1 = 17784637;
   //let id2 = 15278385;
   console.log(req.body);
@@ -58,7 +58,7 @@ app.post('/', function(req, res) {
     uri: 'https://api.vk.com/method/friends.get?v=5.52&',
     qs: {
       access_token: access_token.my_token,
-      user_id: id1,
+      user_id: '',
       order: 'hints'
     },
     json: true
@@ -68,8 +68,8 @@ app.post('/', function(req, res) {
     uri: 'https://api.vk.com/method/users.get?v=5.89',
     qs: {
       access_token: access_token.my_token,
-      user_ids: `${req.body.id1}, ${req.body.id2}`,
-      fields: "photo_200"
+      user_ids: `${id1}, ${id2}`,
+      fields: "photo_200, screen_name"
     },
     json: true
   };
@@ -81,7 +81,19 @@ app.post('/', function(req, res) {
   console.log('getting data from VK-API');
 
   // get data from vk-API
-  request_promise(optionsGetFriends)
+  // получим id пользователей
+  request_promise(optionsGetUserInfo)
+    .then((response) => {
+      // преобразуем id в числа
+      id1 = response.response[0].id - 0;
+      id2 = response.response[1].id - 0;
+      // восстановим запрос optionsGetUserInfo
+      console.log(response);
+      optionsGetUserInfo.qs.user_ids = `${id1}, ${id2}`;
+      //
+      optionsGetFriends.qs.user_id = id1;
+      return request_promise(optionsGetFriends);
+    })
     // первое рукопожатие
     .then((response) => {
       // сложим ответ в объект
@@ -176,7 +188,6 @@ app.post('/', function(req, res) {
       // получим аватарки пользователей
       // заполним id для запроса
       optionsGetUserInfo.qs.user_ids += ',' + result.mutualArr;
-      console.log(optionsGetUserInfo.qs.user_ids );
       return request_promise(optionsGetUserInfo);
     })
     .then((getUserInfo_result) => {
