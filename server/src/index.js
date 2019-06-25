@@ -43,6 +43,8 @@ app.post('/', function(req, res) {
   // check reseived information
   let id1 = req.body.id1;
   let id2 = req.body.id2;
+  let first_user_screenName = '';
+  let second_user_screenName = '';
   //let id1 = 17784637;
   //let id2 = 15278385;
   console.log(req.body);
@@ -87,6 +89,9 @@ app.post('/', function(req, res) {
       // преобразуем id в числа
       id1 = response.response[0].id - 0;
       id2 = response.response[1].id - 0;
+      // заберем screen_names
+      first_user_screenName = response.response[0].screen_name;
+      second_user_screenName = response.response[1].screen_name;
       // восстановим запрос optionsGetUserInfo
       console.log(response);
       optionsGetUserInfo.qs.user_ids = `${id1}, ${id2}`;
@@ -193,7 +198,14 @@ app.post('/', function(req, res) {
     .then((getUserInfo_result) => {
       // обработка ответа с аватарками
       for (let user of getUserInfo_result.response) {
+        console.log(user);
         result.avatars[user.id] = user.photo_200;
+        if (user.screen_name === first_user_screenName) {
+          result.avatars["first_user"] = user.photo_200;
+        }
+        if (user.screen_name === second_user_screenName) {
+          result.avatars["second_user"] = user.photo_200;
+        }
       }
     })
     .then(() => {

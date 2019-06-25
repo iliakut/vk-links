@@ -5,7 +5,7 @@
         <a :href="`https://vk.com/id${id1}`" target="_blank">
           <v-avatar color="grey lighten-4" size="60">
             <img
-                :src="mutualData.avatars[id1]"
+                :src="mutualData.avatars.first_user"
                 alt="avatar"
             />
           </v-avatar>
@@ -25,7 +25,7 @@
         <a :href="`https://vk.com/id${id2}`" target="_blank">
           <v-avatar color="grey lighten-4" size="60">
             <img
-                :src="mutualData.avatars[id2]"
+                :src="mutualData.avatars.second_user"
                 alt="avatar"
             />
           </v-avatar>
@@ -35,7 +35,7 @@
         <a :href="`https://vk.com/id${id1}`" target="_blank">
           <v-avatar color="grey lighten-4" size="60">
             <img
-                :src="mutualData.avatars[id1]"
+                :src="mutualData.avatars.first_user"
                 alt="avatar"
             />
           </v-avatar>
@@ -75,7 +75,7 @@
         <a :href="`https://vk.com/id${id2}`" target="_blank">
         <v-avatar color="grey lighten-4" size="60">
           <img
-              :src="mutualData.avatars[id2]"
+              :src="mutualData.avatars.second_user"
               alt="avatar"
           />
         </v-avatar>
