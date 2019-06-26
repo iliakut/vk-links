@@ -4,7 +4,7 @@
       <v-layout text-xs-center column>
         <v-flex xs12 offset-(xs4)>
           <v-text-field
-            v-model="first_id"
+            v-model="first_user"
             label="первый пользователь"
             placeholder="https:/vk.com/first_user"
             :rules="rules"
@@ -21,10 +21,10 @@
         </v-flex>
         <v-flex xs12>
           <v-text-field
-            v-model="second_id"
+            v-model="second_user"
             label="второй пользователь"
             placeholder="https:/vk.com/second_user"
-            :rules="rules"
+            :rules="rules.concat([checkIfSimilarUsers()])"
             required
             outline
             color="#4c75a3"
@@ -43,13 +43,14 @@ import { mapState, mapMutations } from "vuex";
 export default {
   name: "Search",
   data: () => ({
-    first_id: "",
-    second_id: "",
+    first_user: "",
+    second_user: "",
     valid: false,
     rules: [
       v => (v || "").indexOf(" ") < 0 || "Пробелы недопустимы",
       v => !!v || "Обязательное поле",
-      v => /https:\/\/vk.com\//.test(v) || 'Не похоже на ссылку' // - закомментировал на время разработки
+      v => /https:\/\/vk.com\//.test(v) || 'Не похоже на ссылку вк',
+      v => /https:\/\/vk.com\/./.test(v) || 'Не хватает символов после /'
     ]
   }),
 
@@ -80,17 +81,20 @@ export default {
         this.setSecondId(this.second_user_screenName);
       }
     },
+    checkIfSimilarUsers() {
+      return this.first_user !== this.second_user || 'Одинаковые пользователи';
+    },
     ...mapMutations(["changeStatus", "writeMutualData", "setFirstId", "setSecondId"])
   },
   computed: {
     ...mapState(["searchStatus"]),
     first_user_screenName: function () {
-      let index = this.first_id.indexOf("com/");
-      return this.first_id.slice(index + 4, this.first_id.length);
+      let index = this.first_user.indexOf("com/");
+      return this.first_user.slice(index + 4, this.first_user.length);
     },
     second_user_screenName: function () {
-      let index = this.second_id.indexOf("com/");
-      return this.second_id.slice(index + 4, this.second_id.length);
+      let index = this.second_user.indexOf("com/");
+      return this.second_user.slice(index + 4, this.second_user.length);
     }
   }
 };
