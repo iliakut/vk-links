@@ -12,16 +12,21 @@
             outline
             color="#4c75a3"
             hint="link"
+            @keyup.enter="$refs.second_user.focus()"
           ></v-text-field>
         </v-flex>
         <v-flex xs12>
           <v-btn round @click="activateSearch" color="#4c75a3">
             Найти связи
           </v-btn>
+          <v-btn round @click="test" color="#4c75a3">
+            test
+          </v-btn>
         </v-flex>
         <v-flex xs12>
           <v-text-field
             v-model="second_user"
+            ref="second_user"
             label="второй пользователь"
             placeholder="https:/vk.com/second_user"
             :rules="rules.concat([checkIfSimilarUsers()])"
@@ -29,6 +34,7 @@
             outline
             color="#4c75a3"
             hint="link"
+            @keyup.enter="activateSearch"
           ></v-text-field>
         </v-flex>
       </v-layout>
@@ -55,6 +61,9 @@ export default {
   }),
 
   methods: {
+    test: function() {
+      console.log(this.$refs.second_user.focus());
+    },
     sendName: function() {
       this.changeStatus(1);
       axios
