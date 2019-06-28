@@ -15,7 +15,7 @@
 
 <script>
 export default {
-  name: "AlertServer",
+  name: "AlertWarningWindow",
   props: {
     buttonRoute: {
       type: String,

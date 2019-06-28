@@ -90,7 +90,7 @@
 import { mapState } from "vuex";
 
 export default {
-  name: "Results",
+  name: "MutualFriends",
   computed: {
     ...mapState(["mutualData", "id1", "id2"])
   }

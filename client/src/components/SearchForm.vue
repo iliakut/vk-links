@@ -19,9 +19,6 @@
           <v-btn round @click="activateSearch" color="#4c75a3">
             Найти связи
           </v-btn>
-          <v-btn round @click="test" color="#4c75a3">
-            test
-          </v-btn>
         </v-flex>
         <v-flex xs12>
           <v-text-field
@@ -47,10 +44,8 @@ import axios from "axios";
 import { mapState, mapMutations } from "vuex";
 
 export default {
-  name: "Search",
+  name: "SearchForm",
   data: () => ({
-    first_user: "",
-    second_user: "",
     valid: false,
     rules: [
       v => (v || "").indexOf(" ") < 0 || "Пробелы недопустимы",
@@ -61,9 +56,6 @@ export default {
   }),
 
   methods: {
-    test: function() {
-      console.log(this.$refs.second_user.focus());
-    },
     sendName: function() {
       this.changeStatus(1);
       axios
@@ -97,6 +89,22 @@ export default {
   },
   computed: {
     ...mapState(["searchStatus"]),
+    first_user: {
+      get() {
+        return this.$store.state.first_user_link;
+      },
+      set(value) {
+        this.$store.commit('setFirstUserLink', value)
+      }
+    },
+    second_user: {
+      get() {
+        return this.$store.state.second_user_link;
+      },
+      set(value) {
+        this.$store.commit('setSecondUserLink', value)
+      }
+    },
     first_user_screenName: function () {
       let index = this.first_user.indexOf("com/");
       return this.first_user.slice(index + 4, this.first_user.length);

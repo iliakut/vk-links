@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import Search from "../components/Search";
+import Search from "../components/SearchForm";
 
 export default {
   components: {

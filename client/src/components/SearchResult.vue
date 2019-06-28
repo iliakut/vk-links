@@ -1,10 +1,6 @@
 <template>
   <v-container>
     <v-layout text-xs-center wrap column>
-      <v-flex x12>
-        <v-btn @click="change">test</v-btn>
-        <span>{{ searchStatus }}</span>
-      </v-flex>
       <v-flex xs12 v-if="searchStatus === 0">
         <AlertWarningWindow
           message="Необходимо заполнить поля и начать поиск"
@@ -31,7 +27,7 @@
 <script>
 import Loader from "../components/Loader";
 import AlertWarningWindow from "./AlertWarningWindow";
-import Results from "./Results";
+import Results from "./MutualFriends";
 import { mapState, mapMutations } from "vuex";
 export default {
   name: "SearchResult",
@@ -40,20 +36,11 @@ export default {
     AlertWarningWindow,
     Results
   },
-  data: () => ({
-    test: 0
-  }),
+  data: () => ({}),
   computed: {
     ...mapState(["searchStatus"])
   },
   methods: {
-    change: function() {
-      this.test++;
-      if (this.test === 4) {
-        this.test = 0;
-      }
-      this.changeStatus(this.test);
-    },
     ...mapMutations(["changeStatus"])
   }
 };

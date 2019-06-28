@@ -12,6 +12,8 @@ export default new Vuex.Store({
     // 3 - received
     id1: "",
     id2: "",
+    first_user_link: "",
+    second_user_link: "",
     mutualData: {}
   },
   mutations: {
@@ -26,6 +28,12 @@ export default new Vuex.Store({
     },
     setSecondId(state, payload) {
       state.id2 = payload;
+    },
+    setFirstUserLink(state, payload) {
+      state.first_user_link = payload;
+    },
+    setSecondUserLink(state, payload) {
+      state.second_user_link = payload;
     }
   },
   actions: {}
