@@ -1,5 +1,7 @@
-const access_token = require('./access_token');
+// config
+const access_token = require('./config/access_token');
 const express = require('express');
+// standart modules
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const morgan = require('morgan');
@@ -7,6 +9,8 @@ const config = require('./config/config');
 const request_promise = require('request-promise');
 const fs = require("fs");
 const app = express();
+// my Methods
+const myMethods = require('./myMethods');
 
 app.use(morgan('combined'));
 app.use(bodyParser.json());
@@ -16,29 +20,6 @@ app.use(cors());
 app.listen(process.env.PORT || config.port,
   () => console.log(`Server start on port ${config.port} ...`));
 
-function promiseFactory(one_of_promise_all) {
-  return request_promise(one_of_promise_all);
-}
-function isMutual(mutualArr, id) {
-  return mutualArr.includes(id);
-}
-function findMutualFriends(friendsArrOfObj, id) {
-  let mutualArr = [];
-  for (let friendId in friendsArrOfObj) {
-    if (friendsArrOfObj[friendId] !== "error") {
-      if (friendsArrOfObj[friendId].ids_arr.includes(id)) {
-        mutualArr.push(friendId);
-      }
-    }
-
-  }
-  return mutualArr;
-}
-/*app.get('/', (req, res) => {
-  res.send('server ok');
-  console.log(req);
-});*/
-
 app.post('/', function(req, res) {
   // check reseived information
   let id1 = req.body.id1;
@@ -46,7 +27,6 @@ app.post('/', function(req, res) {
   let first_user_screenName = '';
   let second_user_screenName = '';
 
-  console.log(req.body);
   // создадим объект с результатом
   let id_list = {
     'ids_arr': 0,
@@ -184,9 +164,9 @@ app.post('/', function(req, res) {
       // обработка результатов
       fs.appendFileSync("id_list.json", JSON.stringify(id_list));
       // проверить если пользователи и так друзья
-      result.areMutual = isMutual(id_list.ids_arr, id2);
+      result.areMutual = myMethods.mutuality.isMutual(id_list.ids_arr, id2);
       // проверить если пользователи имеют общих друзей
-      result.mutualArr = findMutualFriends(id_list.fiends_obj, id2);
+      result.mutualArr = myMethods.mutuality.findMutualFriends(id_list.fiends_obj, id2);
       // запишеп результат в файл
       fs.appendFileSync("result.json", JSON.stringify(result));
 
@@ -198,6 +178,7 @@ app.post('/', function(req, res) {
     .then((getUserInfo_result) => {
       console.log('запрос аватарок');
       // обработка ответа с аватарками
+      console.log(getUserInfo_result.response);
       for (let user of getUserInfo_result.response) {
         result.avatars[user.id] = user.photo_200;
         if (user.screen_name === first_user_screenName) {
