@@ -45,8 +45,7 @@ app.post('/', function(req, res) {
   let id2 = req.body.id2;
   let first_user_screenName = '';
   let second_user_screenName = '';
-  //let id1 = 17784637;
-  //let id2 = 15278385;
+
   console.log(req.body);
   // создадим объект с результатом
   let id_list = {
@@ -80,7 +79,7 @@ app.post('/', function(req, res) {
     mutualArr: [],
     avatars: {}
   };
-  console.log('getting data from VK-API');
+  console.log('getting data from VK-API - запрос ID пользователей');
 
   // get data from vk-API
   // получим id пользователей
@@ -93,7 +92,6 @@ app.post('/', function(req, res) {
       first_user_screenName = response.response[0].screen_name;
       second_user_screenName = response.response[1].screen_name;
       // восстановим запрос optionsGetUserInfo
-      console.log(response);
       optionsGetUserInfo.qs.user_ids = `${id1}, ${id2}`;
       //
       optionsGetFriends.qs.user_id = id1;
@@ -101,6 +99,7 @@ app.post('/', function(req, res) {
     })
     // первое рукопожатие
     .then((response) => {
+      console.log('Promise all - первое рукопожатие');
       // сложим ответ в объект
       // список друзей
       id_list.ids_arr = response.response.items;
@@ -124,11 +123,12 @@ app.post('/', function(req, res) {
     // второе рукопожатие
     .then((promises_arr) => {
       // запустить все запросы (получить списки друзей людей из массива)
+      console.log('Promise_all_arr - запрос второго рукопожатия');
       return Promise.all(promises_arr);
     })
     // обработка второго рукопожатия и запрос третьего (пока не реализован запрос третьего)
     .then(promise_all_result => {
-      console.log('getting deeper');
+      console.log('getting deeper - обработка второго рукопожатия');
       let promises_all_arr_deeper = [];
       // составим результируюзий объект и заполним новый promise_all
       for (let i = 0; i < promise_all_result.length; i++) {
@@ -196,9 +196,9 @@ app.post('/', function(req, res) {
       return request_promise(optionsGetUserInfo);
     })
     .then((getUserInfo_result) => {
+      console.log('запрос аватарок');
       // обработка ответа с аватарками
       for (let user of getUserInfo_result.response) {
-        console.log(user);
         result.avatars[user.id] = user.photo_200;
         if (user.screen_name === first_user_screenName) {
           result.avatars["first_user"] = user.photo_200;
