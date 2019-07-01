@@ -11,6 +11,8 @@ const fs = require("fs");
 const app = express();
 // my Methods
 const myMethods = require('./myMethods');
+// my Properties
+const myProperties = require('./myProperties');
 
 app.use(morgan('combined'));
 app.use(bodyParser.json());
@@ -21,176 +23,58 @@ app.listen(process.env.PORT || config.port,
   () => console.log(`Server start on port ${config.port} ...`));
 
 app.post('/', function(req, res) {
-  // check reseived information
-  let id1 = req.body.id1;
-  let id2 = req.body.id2;
-  let first_user_screenName = '';
-  let second_user_screenName = '';
-
-  // создадим объект с результатом
-  let id_list = {
-    'ids_arr': 0,
-    'len': 0,
-    'fiends_obj': {}
-  };
-  // настройка запроса к VK-API
-  let optionsGetFriends = {
-    method: 'GET',
-    uri: 'https://api.vk.com/method/friends.get?v=5.52&',
-    qs: {
-      access_token: access_token.my_token,
-      user_id: '',
-      order: 'hints'
-    },
-    json: true
-  };
-  let optionsGetUserInfo = {
-    method: 'GET',
-    uri: 'https://api.vk.com/method/users.get?v=5.89',
-    qs: {
-      access_token: access_token.my_token,
-      user_ids: `${id1}, ${id2}`,
-      fields: "photo_200, screen_name"
-    },
-    json: true
-  };
-  let result = {
-    areMutual: false,
-    mutualArr: [],
-    avatars: {}
-  };
+  let properties = myProperties.properties(req);
+  let options = myProperties.options(access_token.my_token, properties.id1, properties.id2);
   console.log('getting data from VK-API - запрос ID пользователей');
-
-  // get data from vk-API
   // получим id пользователей
-  request_promise(optionsGetUserInfo)
+  request_promise(options.optionsGetUserInfo)
     .then((response) => {
       // преобразуем id в числа
-      id1 = response.response[0].id - 0;
-      id2 = response.response[1].id - 0;
+      properties.id1 = myMethods.convertResponce.getFirstId_typeNumber(response);
+      properties.id2 = myMethods.convertResponce.getSecondId_typeNumber(response);
       // заберем screen_names
-      first_user_screenName = response.response[0].screen_name;
-      second_user_screenName = response.response[1].screen_name;
+      properties.first_user_screenName = myMethods.convertResponce.getFirstScreen_Name(response);
+      properties.second_user_screenName = myMethods.convertResponce.getSecondScreen_Name(response);
       // восстановим запрос optionsGetUserInfo
-      optionsGetUserInfo.qs.user_ids = `${id1}, ${id2}`;
-      //
-      optionsGetFriends.qs.user_id = id1;
-      return request_promise(optionsGetFriends);
+      options.optionsGetUserInfo.qs.user_ids = `${properties.id1}, ${properties.id2}`;
+      // запишем числовой id в запрос
+      options.optionsGetFriends.qs.user_id = properties.id1;
+      console.log('Promise all - первое рукопожатие');
+      return request_promise(options.optionsGetFriends);
     })
     // первое рукопожатие
     .then((response) => {
-      console.log('Promise all - первое рукопожатие');
       // сложим ответ в объект
       // список друзей
-      id_list.ids_arr = response.response.items;
+      properties.id_list.ids_arr = response.response.items;
       // длина списка друзей
-      id_list.len = response.response.count;
-
+      properties.id_list.len = response.response.count;
       // пройтись по всему массиву id (списку друзей) дла составления массива promises
-      let promises_arr = [];
-
-      for (let i = 0; i < id_list.ids_arr.length; i++) {
-        // склонировать исходник опция для запроса
-        const temp_options = JSON.parse(JSON.stringify(optionsGetFriends));
-        // подменить id для запроса
-        temp_options.qs.user_id = id_list.ids_arr[i];
-        // добавить объект запроса в массив прописов
-        promises_arr.push(request_promise(temp_options));
-      }
-      // вернуть список промисов для последующей обработки
-      return promises_arr
-    })
-    // второе рукопожатие
-    .then((promises_arr) => {
-      // запустить все запросы (получить списки друзей людей из массива)
-      console.log('Promise_all_arr - запрос второго рукопожатия');
-      return Promise.all(promises_arr);
+      console.log('Promise all - запрос второго');
+      return Promise.all(myMethods.formRequests.getPromises_arr(properties.id_list, options.optionsGetFriends, request_promise));
     })
     // обработка второго рукопожатия и запрос третьего (пока не реализован запрос третьего)
     .then(promise_all_result => {
       console.log('getting deeper - обработка второго рукопожатия');
-      let promises_all_arr_deeper = [];
-      // составим результируюзий объект и заполним новый promise_all
-      for (let i = 0; i < promise_all_result.length; i++) {
-        // проверка на ошибку ответа
-        if (promise_all_result[i].response !== undefined) {
-          // добавим объект этого друга с его списком в массив
-          let current_id = id_list.ids_arr[i];
-          // arr для создания нескольких promise all
-          let promises_all_temp_arr = [];
-          id_list.fiends_obj[current_id] = {
-            'ids_arr': promise_all_result[i].response.items,
-            'len': promise_all_result[i].response.count,
-            'fiends_obj': {}
-          };
-          // составим promise_all_deeper для третьего рукопожатия
-          // так как делать 100 * 100 (в среднем) запросов на сервер выдает ошибку ENOBUFS
-          for (let j = 0; j < 3; j++) {
-            // склонировать исходник опции для запроса
-            const temp_options = JSON.parse(JSON.stringify(optionsGetFriends));
-            // подменить id для запроса
-            temp_options.qs.user_id = promise_all_result[i].response.items[j];
-            // добавить объект запроса в массив промисов
-            promises_all_temp_arr.push(request_promise(temp_options));
-          }
-          // вернем все promise all в список из promise all (массив массивов)
-          promises_all_arr_deeper.push(promises_all_temp_arr);
-        } else {
-          // если ошибка ответа (скрыт список друзей)
-          let current_id = id_list.ids_arr[i];
-          id_list.fiends_obj[current_id] = 'error'
-        }
-      }
-      // запрос третьего рукопожатия
-      /*async function get_all_promises_all() {
-        let promise_all_result = [];
-        let counter = 0;
-        for (const promise_arr of promises_all_arr_deeper) {
-          const result = await Promise.all(promise_arr);
-          promise_all_result.push(result);
-          counter++;
-          //console.log(counter);
-        }
-        return promise_all_result;
-      }
-      (async () => {
-        let data = await get_all_promises_all();
-        fs.appendFile("data.json", JSON.stringify(data), (err) => {
-          if (err) throw err;
-          console.log('The "data to append" was appended to file!');
-        });
-        fs.appendFileSync("id_list.json", JSON.stringify(id_list));
-      })();*/
-      // обработка результатов
-      fs.appendFileSync("id_list.json", JSON.stringify(id_list));
+      // составим результируюзий объект
+      properties.id_list.fiends_obj = myMethods.convertResponce.formResultObj(promise_all_result, properties.id_list);
       // проверить если пользователи и так друзья
-      result.areMutual = myMethods.mutuality.isMutual(id_list.ids_arr, id2);
+      properties.result.areMutual = myMethods.mutuality.isMutual(properties.id_list.ids_arr, properties.id2);
       // проверить если пользователи имеют общих друзей
-      result.mutualArr = myMethods.mutuality.findMutualFriends(id_list.fiends_obj, id2);
-      // запишеп результат в файл
-      fs.appendFileSync("result.json", JSON.stringify(result));
-
+      properties.result.mutualArr = myMethods.mutuality.findMutualFriends(properties.id_list.fiends_obj, properties.id2);
       // получим аватарки пользователей
       // заполним id для запроса
-      optionsGetUserInfo.qs.user_ids += ',' + result.mutualArr;
-      return request_promise(optionsGetUserInfo);
+      options.optionsGetUserInfo.qs.user_ids += ',' + properties.result.mutualArr;
+      return request_promise(options.optionsGetUserInfo);
     })
     .then((getUserInfo_result) => {
       console.log('запрос аватарок');
       // обработка ответа с аватарками
-      console.log(getUserInfo_result.response);
-      for (let user of getUserInfo_result.response) {
-        result.avatars[user.id] = user.photo_200;
-        if (user.screen_name === first_user_screenName) {
-          result.avatars["first_user"] = user.photo_200;
-        }
-        if (user.screen_name === second_user_screenName) {
-          result.avatars["second_user"] = user.photo_200;
-        }
-      }
+      properties.result.avatars = myMethods.convertResponce.getAvatars(getUserInfo_result, properties.first_user_screenName, properties.second_user_screenName);
     })
     .then(() => {
-      res.send(result); // отправить клиенту
+      console.log('Отправка данных на фронт');
+      res.send(properties.result); // отправить клиенту
     })
     .catch((error) => {
       console.log(error);
