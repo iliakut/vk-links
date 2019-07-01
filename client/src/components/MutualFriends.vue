@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-layout align-center column>
-      <v-flex xs12 ma-2 v-if="mutualData.areMutual">
+      <v-flex xs12 ma-2>
         <a :href="`https://vk.com/id${id1}`" target="_blank">
           <v-avatar color="grey lighten-4" size="60">
             <img
@@ -10,7 +10,7 @@
             />
           </v-avatar>
         </a>
-        <v-avatar>
+        <v-avatar v-if="mutualData.areMutual">
           <svg width="100%" height="100%">
             <line
               x1="0%"
@@ -21,6 +21,9 @@
               stroke-width="3"
             ></line>
           </svg>
+        </v-avatar>
+        <v-avatar v-else>
+          <v-icon>clear</v-icon>
         </v-avatar>
         <a :href="`https://vk.com/id${id2}`" target="_blank">
           <v-avatar color="grey lighten-4" size="60">
@@ -82,7 +85,7 @@
         </a>
       </v-flex>
     </v-layout>
-    <span>{{ mutualData }}</span>
+    <span v-show="!mutualData.areMutual">no links</span>
   </v-container>
 </template>
 
