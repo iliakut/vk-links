@@ -1,5 +1,5 @@
 # vk-links
-Vue.js app based on vk-api, node.js (require)
+Vue.js app based on vk-api, node.js (request)
 
 the project contains server and client parts.
 if you want to use server part you need to create access_token.js file:
